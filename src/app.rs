@@ -5,7 +5,7 @@ use native_windows_gui as nwg;
 use std::fmt::Display;
 
 use strum::IntoEnumIterator;
-use nwg::{Event, FileDialogAction, MessageParams, MessageButtons, MessageIcons, MessageChoice};
+use nwg::{Event, FileDialogAction, MessageParams, MessageButtons, MessageIcons};
 
 use crate::gunmacro::{GunMacro, Item};
 
@@ -121,8 +121,6 @@ impl App {
 
 	pub fn run(self) {
 		let h_window = self.window.handle;
-		let h_list_items = self.list_items.handle;
-		let h_list_sel = self.list_sel.handle;
 		let h_btn_add = self.btn_add.handle;
 		let h_btn_rmv = self.btn_rmv.handle;
 		let h_btn_gen = self.btn_gen.handle;
@@ -211,8 +209,6 @@ impl App {
 							};
 						}
 					}
-
-					let gm = GunMacro::from_items(&build);
 				}
 
 				_ => {}

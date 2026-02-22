@@ -1,27 +1,17 @@
 // main
 
-#![allow(unused)]
+#![cfg_attr(debug_assertions, allow(unused))]
+#![windows_subsystem = "windows"]
 
 mod app;
 mod gunmacro;
 mod utils;
 
 use native_windows_gui as nwg;
-
-use std::cell::RefCell;
-use std::rc::Rc;
-use nwg::{NativeUi, Event, MessageParams, MessageButtons, MessageIcons, MessageChoice};
-use strum::IntoEnumIterator;
-
-use gunmacro::{
-	Class, Input, Item,
-	GunMacro, GunMacroBuilder,
-};
-
 use crate::app::App;
 
-const CHANGELOG: &str = include_str!("../CHANGELOG");
-const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub const CHANGELOG: &str = include_str!("../CHANGELOG");
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 fn main() {
 	nwg::init().expect("Failed to init NWG");
