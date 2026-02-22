@@ -1,1 +1,3 @@
+# Jailbreak Gun Macro Maker
+
 A program to help with creating gun macros for the roblox game Jailbreak.

@@ -1,2 +1,13 @@
-v0.1.0
+# Changelog
+
+## Unreleased
+### Fixes
+- Saving a file now appends the correct file extension if none is given
+
+### Changes
+- Temporarily removed Flashlight and Binoculars from equipable weapons due to an issue with grabbing them that I can't find a cause for
+- Added a Debug button that displays the macro's plaintext in a popup
+- Debug builds now say `[DEBUG]` in the window title
+
+## v0.1.0 - 2/21/2026
 - Initial release

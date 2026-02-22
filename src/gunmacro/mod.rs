@@ -25,23 +25,24 @@ pub struct GunMacro {
 impl GunMacroBuilder {
 	pub fn new() -> Self {
 		Self {
-			cursor: 0,
+			cursor: 1,
 			class: Class::Gun,
 			inputs: vec![
+				// these inputs align the cursor to the pistol
 				(Input::Backslash, 1),
 				(Input::Left, 4),
-				(Input::Right, 2),
+				(Input::Right, 3),
 			]
 		}
 	}
 
 	fn add_input(&mut self, input: Input) {
-		self.add_input_n(input, 1);
+		self.inputs.push((input, 1));
 	}
 
 	fn add_input_n(&mut self, input: Input, n: u32) {
-		if n > 0 {
-			self.inputs.push((input, n))
+		if n != 0 {
+			self.inputs.push((input, n));
 		}
 	}
 
@@ -54,19 +55,20 @@ impl GunMacroBuilder {
 		}
 	}
 	
-	pub fn move_cursor_to(&mut self, c: i32) {
-		self.move_cursor(c - self.cursor);
+	pub fn move_cursor_to(&mut self, pos: i32) {
+		self.move_cursor(pos - self.cursor);
 	}
 
 	pub fn select_class(&mut self, class: Class) {
 		self.move_cursor_to(0);
-		match class { // pick the menu
+		match class {
 			Class::Gun => self.add_input(Input::Up),
 			Class::Explosive => {},
 			Class::Misc => self.add_input(Input::Down),
 		}
 		self.add_input(Input::Enter);
-		match class { // align the cursor to the misc menu button
+		self.class = class;
+		match class {
 			Class::Gun => self.add_input_n(Input::Down, 2),
 			Class::Explosive => self.add_input(Input::Down),
 			Class::Misc => {},
@@ -77,9 +79,18 @@ impl GunMacroBuilder {
 		if self.class != item.class() {
 			self.select_class(item.class());
 		}
+		self.move_cursor_to(item.order());
+		self.add_input(Input::Enter);
 
-		self.move_cursor_to(item.order()); // move to the item
-		self.add_input(Input::Enter); // equip the item
+		// explosive ammo
+		if item.class() == Class::Explosive {
+			if item == Item::RocketLauncher {
+				self.move_cursor(-1);
+			} else {
+				self.move_cursor(1);
+			}
+			self.add_input_n(Input::Enter, 10);
+		}
 	}
 
 	pub fn finish(mut self) -> GunMacro {
@@ -104,7 +115,10 @@ impl GunMacro {
 
 	pub fn to_ahk_script(&self) -> String {
 		let mut s = String::new();
-		s.push_str("Keybind::{\n");
+		s.push_str("#Requires AutoHotkey v2.0\n");
+		s.push_str("#SingleInstance Force\n");
+		s.push_str("\n");
+		s.push_str("PgDn::{\n");
 		for &(input, n) in &self.inputs {
 			let term = match input {
 				Input::Backslash => "\\".into(),
@@ -117,6 +131,7 @@ impl GunMacro {
 			s.push('\t');
 			s += &format!(r#"Send("{{{}}}")"#, action);
 			s.push('\n');
+			// s.push_str("\tSleep(200)\n")
 		}
 		s.push('}');
 		s

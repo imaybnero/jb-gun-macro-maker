@@ -18,6 +18,7 @@ pub struct App {
 	btn_add: nwg::Button,
 	btn_rmv: nwg::Button,
 	btn_gen: nwg::Button,
+	btn_debug: nwg::Button,
 	dropdown_format: nwg::ComboBox<MacroFormat>,
 }
 
@@ -51,7 +52,11 @@ impl App {
 	}
 
 	pub fn build_ui(&mut self) {
-		self.title = format!("ice's gunmacro maker v{}", crate::VERSION);
+		if cfg!(debug_assertions) {
+			self.title = format!("ice's gunmacro maker v{} [DEBUG]", crate::VERSION);
+		} else {
+			self.title = format!("ice's gunmacro maker v{}", crate::VERSION);
+		}
 
 		// init window
 		nwg::Window::builder()
@@ -107,6 +112,15 @@ impl App {
 			.build(&mut self.btn_gen)
 			.unwrap();
 
+		// init btn debug
+		nwg::Button::builder()
+			.parent(&self.window)
+			.text("Debug")
+			.position((220, 260))
+			.size((180, 30))
+			.build(&mut self.btn_debug)
+			.unwrap();
+
 		// init format dropdown
 		nwg::ComboBox::builder()
 			.parent(&self.window)
@@ -124,6 +138,7 @@ impl App {
 		let h_btn_add = self.btn_add.handle;
 		let h_btn_rmv = self.btn_rmv.handle;
 		let h_btn_gen = self.btn_gen.handle;
+		let h_btn_debug = self.btn_debug.handle;
 
 		nwg::full_bind_event_handler(&self.window.handle, move |event, _, handle| {
 			match event {
@@ -163,7 +178,7 @@ impl App {
 						return;
 					}
 
-					let fmt  = match self.dropdown_format.selection() {
+					let fmt = match self.dropdown_format.selection() {
 						Some(idx) => self.dropdown_format.collection()[idx],
 						None => {
 							nwg::message(&MessageParams {
@@ -188,6 +203,15 @@ impl App {
 
 					if dialog.run(Some(h_window)) {
 						if let Ok(path) = dialog.get_selected_item() {
+							let mut path = std::path::PathBuf::from(path);
+							
+							if path.extension().is_none() {
+								match fmt {
+									MacroFormat::Ahk => path.set_extension("ahk"),
+									MacroFormat::Plaintext => path.set_extension("txt"),
+								};
+							}
+
 							let content = match fmt {
 								MacroFormat::Ahk => gm.to_ahk_script(),
 								MacroFormat::Plaintext => gm.to_plaintext(),
@@ -200,6 +224,7 @@ impl App {
 									icons: MessageIcons::Info,
 									buttons: MessageButtons::Ok,
 								}),
+
 								Err(e) => nwg::message(&MessageParams {
 									title: "Error",
 									content: &format!("Failed to save macro\n\nError:{e}"),
@@ -211,6 +236,29 @@ impl App {
 					}
 				}
 
+				// debug click
+				Event::OnButtonClick if handle == h_btn_debug => {
+					let build = self.list_sel.collection();
+					if build.len() == 0 {
+						nwg::message(&MessageParams {
+							title: "Error",
+							content: "Must select at least one item",
+							icons: MessageIcons::Error,
+							buttons: MessageButtons::Ok,
+						});
+						return;
+					}
+
+					let gm = GunMacro::from_items(&build);
+					nwg::message(&MessageParams {
+						title: "Debug",
+						content: &gm.to_plaintext(),
+						icons: MessageIcons::Info,
+						buttons: MessageButtons::Ok,
+					});
+				}
+				
+				// ignore other
 				_ => {}
 			}
 		});
