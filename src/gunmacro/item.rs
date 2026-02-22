@@ -24,8 +24,8 @@ pub enum Item {
 	Grenade = 25,
 	RocketLauncher = 28,
 	// misc
-	Flashlight = 31,
-	Binoculars = 32,
+	// Flashlight = 31,
+	// Binoculars = 32,
 }
 
 impl Item {
@@ -41,7 +41,7 @@ impl Item {
 			C4 | SmokeGrenade | Grenade | RocketLauncher => Class::Explosive,
 
 			// misc
-			Flashlight | Binoculars => Class::Misc,
+			// Flashlight | Binoculars => Class::Misc,
 		}
 	}
 
@@ -77,8 +77,8 @@ impl Display for Item {
 			Grenade => "Grenades",
 			RocketLauncher => "Rocket Launcher",
 
-			Flashlight => "Flashlight",
-			Binoculars => "Binoculars",
+			// Flashlight => "Flashlight",
+			// Binoculars => "Binoculars",
 		})
 	}
 }
