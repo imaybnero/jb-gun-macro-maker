@@ -1,0 +1,10 @@
+[package]
+name = "jb-gun-macro-maker"
+authors = ["iiceisnice"]
+version = "0.1.0"
+edition = "2024"
+description = "A program to help with creating gun macros for the roblox game Jailbreak."
+
+[dependencies]
+native-windows-gui = "1.0.13"
+strum = { version = "0.27.2", features = ["derive"] }
