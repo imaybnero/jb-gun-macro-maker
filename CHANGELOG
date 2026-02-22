@@ -2,6 +2,7 @@
 
 ## Unreleased
 ### Fixes
+- Grabbing explosives now also purchases ammo
 - Saving a file now appends the correct file extension if none is given
 
 ### Changes
